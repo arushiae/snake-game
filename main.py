@@ -1,15 +1,29 @@
-import pygame
-import snake
-
+import pygame, sys
+import random
+from pygame.math import Vector2
+from display import *
 
 pygame.init()
 
-# creating game window and setting caption
-width = 500
-height = 500
+# creating game window, setting caption & clock
+cell_size = 25
+cell_number = 20
 
-screen = pygame.display.set_mode((width, height))
+screen = pygame.display.set_mode((cell_number * cell_size, cell_number * cell_size))
 pygame.display.set_caption("Python")
+clock = pygame.time.Clock()
+
+class Mouse():
+    def __init__(self):
+        self.x = random.randint(0, cell_number - 1)
+        self.y = random.randint(0, cell_number - 1)
+        self.pos = Vector2(self.x, self.y) #storing x and y position in a 2D vector
+        self.image = pygame.image.load('mouse.png').convert_alpha()
+        self.image_resized = pygame.transform.scale(self.image, (cell_size, cell_size))
+
+    def draw_mouse(self):
+        mouse_rect = pygame.Rect(self.pos.x * cell_size, self.pos.y * cell_size, cell_size, cell_size)
+        screen.blit(self.image_resized, mouse_rect)
 
 # setting the snake icon
 icon = pygame.image.load('icon.png')
@@ -42,27 +56,10 @@ title_text_bg, title_bg_rect = render_text(title_font, "PYTHON", dark_green, (25
 start_font = pygame.font.Font(font, 24)
 start_text, start_rect = render_text(start_font, "Press any key to start", dark_green, (255, 410))
 
+mouse = Mouse()
+
 running = True
 start_game = False
-
-x = 250
-y = 250
-new_x = 1
-new_y = 0
-
-clock = pygame.time.Clock()
-
-# display snake
-def snake(image):
-    global x, y
-
-    x = x + new_x
-    y = y + new_y
-
-    head_image = pygame.image.load(image).convert_alpha()
-
-    screen.blit(background, (0, 0))
-    screen.blit(head_image, (x%width, y%height))
 
 # game loop
 while running:
@@ -82,40 +79,17 @@ while running:
         # start the game here
         screen.blit(background, (0,0))
 
-        # change snake head direction
-        if (event.type == pygame.KEYDOWN):
-            head_direction = "head_right.png"
-            if (event.key == pygame.K_LEFT):
-                if (new_x != 1):
-                    new_x = -1
-                    head_direction = "head_left.png"
-                new_y = 0
-            elif (event.key == pygame.K_RIGHT):
-                if (new_x != -1):
-                    new_x = 1
-                    head_direction = "head_right.png"
-                new_y = 0
-            elif (event.key == pygame.K_UP):
-                if (new_y != 1):
-                    new_y = -1
-                    head_direction = "head_up.png"
-                new_x = 0
-            elif (event.key == pygame.K_DOWN):
-                if (new_y != -1):
-                    new_y = 1
-                    head_direction = "head_down.png"
-                new_x = 0
-            else:
-                continue
-            snake(head_direction)
+        # change snake head direction and move snake
+        head_direction = findSnakeDirection(event)
+        snake(head_direction)
 
-        # continue moving when there is no key down event
-        if (not pygame.event.get()):
-            snake(head_direction)
+        # insert mouse
+        mouse.draw_mouse()
 
     # set game speed
-    clock.tick(100)
+    clock.tick(8)
 
     pygame.display.flip()
 
 pygame.quit()
+sys.exit()
