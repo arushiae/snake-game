@@ -1,36 +1,17 @@
-import pygame, sys
 import random
-from pygame.math import Vector2
-from display import *
+import sys
+from mouse import Mouse
+from snake import *
+from init import *
 
 pygame.init()
 
-# creating game window, setting caption & clock
-cell_size = 25
-cell_number = 20
-
-screen = pygame.display.set_mode((cell_number * cell_size, cell_number * cell_size))
-pygame.display.set_caption("Python")
 clock = pygame.time.Clock()
-
-class Mouse():
-    def __init__(self):
-        self.x = random.randint(0, cell_number - 1)
-        self.y = random.randint(0, cell_number - 1)
-        self.pos = Vector2(self.x, self.y) #storing x and y position in a 2D vector
-        self.image = pygame.image.load('mouse.png').convert_alpha()
-        self.image_resized = pygame.transform.scale(self.image, (cell_size, cell_size))
-
-    def draw_mouse(self):
-        mouse_rect = pygame.Rect(self.pos.x * cell_size, self.pos.y * cell_size, cell_size, cell_size)
-        screen.blit(self.image_resized, mouse_rect)
 
 # setting the snake icon
 icon = pygame.image.load('icon.png')
 pygame.display.set_icon(icon)
 screen.fill((50,168,52))
-
-background = pygame.image.load('background.png').convert()
 
 # loading and getting rectangle for the snake image
 snake_image = pygame.image.load('snake.png').convert_alpha()
@@ -56,6 +37,7 @@ title_text_bg, title_bg_rect = render_text(title_font, "PYTHON", dark_green, (25
 start_font = pygame.font.Font(font, 24)
 start_text, start_rect = render_text(start_font, "Press any key to start", dark_green, (255, 410))
 
+# create mouse object
 mouse = Mouse()
 
 running = True
@@ -69,6 +51,7 @@ while running:
         elif event.type == pygame.KEYDOWN:
             start_game = True
 
+    # display start screen
     screen.blit(background, (0, 0))
     screen.blit(snake_image, snake_rect)
     screen.blit(title_text_bg, title_bg_rect)
@@ -79,9 +62,11 @@ while running:
         # start the game here
         screen.blit(background, (0,0))
 
-        # change snake head direction and move snake
-        head_direction = findSnakeDirection(event)
-        snake(head_direction)
+        # get head direction from key event
+        head_direction = find_snake_direction(event)
+
+        # move snake
+        snake(head_direction, mouse)
 
         # insert mouse
         mouse.draw_mouse()
