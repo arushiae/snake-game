@@ -7,12 +7,12 @@ pygame.init()
 clock = pygame.time.Clock()
 
 # setting the snake icon
-icon = pygame.image.load('icon.png')
+icon = pygame.image.load('graphics/icon.png')
 pygame.display.set_icon(icon)
 screen.fill((50,168,52))
 
 # loading and getting rectangle for the snake image
-snake_image = pygame.image.load('snake.png').convert_alpha()
+snake_image = pygame.image.load('graphics/snake.png').convert_alpha()
 snake_rect = snake_image.get_rect()
 snake_rect.center = (250, 250)
 
@@ -24,7 +24,7 @@ def render_text(font, text, color, pos):
     return rendered_text, text_rect
 
 # start screen constants
-font = 'DisposableDroidBB.ttf'
+font = 'font/DisposableDroidBB.ttf'
 white = (255, 255, 255)
 dark_green = (21, 71, 52)
 
@@ -34,12 +34,38 @@ title_text, title_rect = render_text(title_font, "PYTHON", white, (255, 140))
 title_text_bg, title_bg_rect = render_text(title_font, "PYTHON", dark_green, (258, 143))
 start_font = pygame.font.Font(font, 24)
 start_text, start_rect = render_text(start_font, "Press any key to start", dark_green, (255, 410))
+# font for the points system
+points_font = pygame.font.Font(font, 30)
+points_outline_font = pygame.font.Font(font, 30)
 
-# create mouse object
+# create characters object
 characters = Characters()
+
+def display_points():
+    # update points text and rectangle
+    points_text, points_rect = render_text(
+        points_font, f"Points: {characters.points}", white, (62, 18))
+
+    points_outline_text, points_outline_rect = render_text(
+        points_outline_font, f"Points: {characters.points}", dark_green, (64, 20))
+
+    # blit points text and rectangle
+    screen.blit(points_outline_text, points_outline_rect)
+    screen.blit(points_text, points_rect)
+
+def display_start_screen():
+    # display start screen
+    screen.blit(background, (0, 0))
+    screen.blit(snake_image, snake_rect)
+    screen.blit(title_text_bg, title_bg_rect)
+    screen.blit(title_text, title_rect)
+    screen.blit(start_text, start_rect)
 
 running = True
 start_game = False
+
+# displaying the start screen
+display_start_screen()
 
 # game loop
 while running:
@@ -48,13 +74,6 @@ while running:
             running = False
         elif event.type == pygame.KEYDOWN:
             start_game = True
-
-    # display start screen
-    screen.blit(background, (0, 0))
-    screen.blit(snake_image, snake_rect)
-    screen.blit(title_text_bg, title_bg_rect)
-    screen.blit(title_text, title_rect)
-    screen.blit(start_text, start_rect)
 
     if start_game:
         # start the game here
@@ -66,6 +85,9 @@ while running:
         # move snake
         characters.display_character(head_direction)
 
+        # display points
+        display_points()
+
     # set game speed
     clock.tick(10)
 
@@ -73,3 +95,4 @@ while running:
 
 pygame.quit()
 sys.exit()
+
