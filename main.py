@@ -1,7 +1,5 @@
-import random
 import sys
-from mouse import Mouse
-from snake import *
+from characters import *
 from init import *
 
 pygame.init()
@@ -38,7 +36,7 @@ start_font = pygame.font.Font(font, 24)
 start_text, start_rect = render_text(start_font, "Press any key to start", dark_green, (255, 410))
 
 # create mouse object
-mouse = Mouse()
+characters = Characters()
 
 running = True
 start_game = False
@@ -63,16 +61,13 @@ while running:
         screen.blit(background, (0,0))
 
         # get head direction from key event
-        head_direction = find_snake_direction(event)
+        head_direction = characters.find_snake_direction(event)
 
         # move snake
-        snake(head_direction, mouse)
-
-        # insert mouse
-        mouse.draw_mouse()
+        characters.display_character(head_direction)
 
     # set game speed
-    clock.tick(8)
+    clock.tick(10)
 
     pygame.display.flip()
 
