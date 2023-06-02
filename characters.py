@@ -5,7 +5,8 @@ from init import *
 from pygame import Vector2
 
 # sound effects
-point_gained_sound = mixer.Sound('music/gameboy-pluck.mp3')
+point_gained_sound = mixer.Sound('audio/gameboy-pluck.mp3')
+life_lost_sound = mixer.Sound('audio/death-sound.mp3')
 
 class Characters():
     def __init__(self):
@@ -29,8 +30,18 @@ class Characters():
     def display_character(self, image):
 
         # update snake attributes
-        self.snake_x = (self.snake_x + self.new_x)%500
-        self.snake_y = (self.snake_y + self.new_y)%500
+        self.snake_x = self.snake_x + self.new_x
+        self.snake_y = self.snake_y + self.new_y
+
+        if (self.check_snake_bounds() is True):
+            print("False")
+            flag = False
+        else:
+            flag = True
+
+        self.snake_x = self.snake_x%500
+        self.snake_y = self.snake_y%500
+
         self.snake_body.append((self.snake_x, self.snake_y))
 
         self.check_mouse_collision()
@@ -40,6 +51,28 @@ class Characters():
         screen.blit(background, (0, 0))
         self.draw_mouse()
         self.draw_snake(image, head_image)
+
+        return flag
+
+    # checks to see if the snake collides with itself or with walls
+    def check_snake_bounds(self):
+        flag = False
+
+        if (self.snake_body[0] in self.snake_body[1:]):
+            flag = True
+        else:
+            flag = False
+
+        if self.snake_x < 0 or self.snake_x >= 500 or self.snake_y < 0 or self.snake_y >= 500:
+            print(self.snake_x, self.snake_y)
+            life_lost_sound.play()
+            flag = True
+            return flag
+        else:
+            flag = False
+
+        return flag
+
 
     # find snake direction from key event
     def find_snake_direction(self, event):
@@ -83,13 +116,28 @@ class Characters():
         for (i,j) in self.snake_body:
             if self.snake_body[len(self.snake_body)-1] == (i, j):
                 screen.blit(head_image, (i, j))
-            else:
-                if (image == 'graphics/head_right.png' or image == 'graphics/head_left.png'):
+            elif (image == 'graphics/head_right.png' or image == 'graphics/head_left.png'):
+                if (self.snake_body[0] == (i, j)) and (len(self.snake_body) > 1):
+                    if (image == 'graphics/head_right.png'):
+                        tail_image = pygame.image.load("graphics/tail_right.png").convert_alpha()
+                    else:
+                        tail_image = pygame.image.load("graphics/tail_left.png").convert_alpha()
+                    screen.blit(tail_image, (i, j))
+                else:
                     body_image = pygame.image.load("graphics/body_hor.png").convert_alpha()
                     screen.blit(body_image, (i, j))
+            elif (image == 'graphics/head_up.png' or image == 'graphics/head_down.png'):
+                if (self.snake_body[0] == (i, j)) and (len(self.snake_body) > 1):
+                    if (image == 'graphics/head_up.png'):
+                        tail_image = pygame.image.load("graphics/tail_up.png").convert_alpha()
+                    else:
+                        tail_image = pygame.image.load("graphics/tail_down.png").convert_alpha()
+                    screen.blit(tail_image, (i, j))
                 else:
                     body_image = pygame.image.load("graphics/body_vert.png").convert_alpha()
                     screen.blit(body_image, (i, j))
+
+
 
     def draw_mouse(self):
         mouse_rect = pygame.Rect(self.pos.x * cell_size, self.pos.y * cell_size, cell_size, cell_size)
