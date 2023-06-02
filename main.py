@@ -41,6 +41,30 @@ points_outline_font = pygame.font.Font(font, 30)
 # create characters object
 characters = Characters()
 
+def display_lives_status():
+    heart_full = pygame.image.load("graphics/heart_full.png").convert_alpha()
+    heart_empty = pygame.image.load("graphics/heart_empty.png").convert_alpha()
+
+    if (lives == 0):
+        screen.blit(heart_full, (400, 15))
+        screen.blit(heart_full, (430, 15))
+        screen.blit(heart_full, (460, 15))
+    elif(lives == 1):
+        screen.blit(heart_full, (400, 15))
+        screen.blit(heart_full, (430, 15))
+        screen.blit(heart_empty, (460, 15))
+    elif (lives == 2):
+        screen.blit(heart_full, (400, 15))
+        screen.blit(heart_empty, (430, 15))
+        screen.blit(heart_empty, (460, 15))
+    elif (lives == 3):
+        screen.blit(heart_empty, (400, 15))
+        screen.blit(heart_empty, (430, 15))
+        screen.blit(heart_empty, (460, 15))
+    else:
+        del characters
+        display_start_screen()
+
 def display_points():
     # update points text and rectangle
     points_text, points_rect = render_text(
@@ -82,14 +106,21 @@ while running:
         # get head direction from key event
         head_direction = characters.find_snake_direction(event)
 
-        # move snake
-        characters.display_character(head_direction)
+        # display characters
+
+        if (characters.display_character((head_direction)) is False):
+            lives = lives + 1
+
+        if (lives>3):
+            display_start_screen()
+        else:
+            display_lives_status()
 
         # display points
         display_points()
 
     # set game speed
-    clock.tick(10)
+    clock.tick(9)
 
     pygame.display.flip()
 
