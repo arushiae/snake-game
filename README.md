@@ -1,3 +1,6 @@
 # snake-game
 
-Our version of the classic Snake game made using Pygame, called 'Python' 🐍.
+'Python' Snake Game
+
+Collaborators:    Arushi Singh, Tanisi Das
+
